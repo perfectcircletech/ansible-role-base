@@ -1,5 +1,6 @@
 ---
-- name: verify base packages configuration block
+- name: Verify base packages configuration for Debian
+  when: ansible_pkg_mgr == 'apt'
   block:
     - name: load role defaults
       ansible.builtin.include_vars:
@@ -63,4 +64,3 @@
       register: removed_additional_packages_check
       failed_when: removed_additional_packages_check.stdout.find(item) != -1
       changed_when: false
-  when: ansible_pkg_mgr == 'apt'

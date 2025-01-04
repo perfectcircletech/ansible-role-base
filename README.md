@@ -45,7 +45,7 @@ base_apt_repos:
 
 ## Testing
 
-Use [molecule](https://ansible.readthedocs.io/projects/molecule/)
+Use [molecule](https://ansible.readthedocs.io/projects/molecule/).
 
 #### Install to venv
 
@@ -59,4 +59,15 @@ pip install -r molecule/requirements.txt
 
 ```bash
 molecule test
+```
+
+## Linting
+
+Use [ansible-lint](https://ansible.readthedocs.io/projects/lint/) and [yamllint](https://yamllint.readthedocs.io/en/stable/).
+
+#### Example
+
+```bash
+ansible-lint -v
+yamllint .
 ```
