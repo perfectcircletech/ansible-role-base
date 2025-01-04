@@ -1,6 +1,6 @@
 ---
-- name: maintain base users
-  include_tasks: users.yml
+- name: Maintain base users
+  ansible.builtin.include_tasks: users.yml
   when: base_users | length > 0
   loop_control:
     loop_var: user
@@ -8,7 +8,7 @@
   tags:
     - base-users
 
-- name: maintain base packages
-  include_tasks: packages.yml
+- name: Maintain base packages
+  ansible.builtin.include_tasks: packages.yml
   tags:
     - base-packages

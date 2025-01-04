@@ -1,50 +1,50 @@
 ---
-- name: verify user creation
+- name: Verify user creation
   hosts: all
   gather_facts: true
   tasks:
-    - name: check if user exists
+    - name: Check if user exists
       ansible.builtin.command: id mbr
       register: user_check
       failed_when: user_check.rc != 0
       changed_when: false
 
-    - name: check user groups
+    - name: Check user groups
       ansible.builtin.assert:
         that:
           - "'sudo' in user_check.stdout"
       when: ansible_facts.os_family == 'Debian'
 
-    - name: check user groups
+    - name: Check user groups
       ansible.builtin.assert:
         that:
           - "'wheel' in user_check.stdout"
       when: ansible_facts.os_family == 'RedHat'
 
-    - name: verify .ssh directory permissions
+    - name: Verify .ssh directory permissions
       ansible.builtin.stat:
         path: /home/mbr/.ssh
       register: ssh_dir
 
-    - name: assert .ssh directory exists
+    - name: Assert .ssh directory exists
       ansible.builtin.assert:
         that:
           - ssh_dir.stat.exists
           - ssh_dir.stat.mode == '0700'
 
-    - name: verify authorized keys
+    - name: Verify authorized keys
       ansible.builtin.command: cat /home/mbr/.ssh/authorized_keys
       register: authorized_keys
       changed_when: false
 
-    - name: assert authorized keys file contains data
+    - name: Assert authorized keys file contains data
       ansible.builtin.assert:
         that:
           - authorized_keys.stdout is not none
 
-- name: verify base packages configuration
+- name: Verify base packages configuration
   hosts: all
   gather_facts: true
   tasks:
-    - name: verify base packages configuration
-      include_tasks: verify_packages_{{ ansible_facts.os_family }}.yml
+    - name: Verify base packages configuration
+      ansible.builtin.include_tasks: verify_packages_{{ ansible_facts.os_family }}.yml
