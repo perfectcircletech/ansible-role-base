@@ -1,0 +1,14 @@
+---
+- name: maintain base users
+  include_tasks: users.yml
+  when: base_users | length > 0
+  loop_control:
+    loop_var: user
+  loop: "{{ base_users }}"
+  tags:
+    - base-users
+
+- name: maintain base packages
+  include_tasks: packages.yml
+  tags:
+    - base-packages

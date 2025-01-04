@@ -1,0 +1,36 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: instance_ubuntu_22.04
+    image: ubuntu:22.04
+    pre_build_image: false
+    privileged: true
+    build:
+      context: .
+  - name: instance_almalinux_9
+    image: almalinux:9
+    pre_build_image: false
+    privileged: true
+
+provisioner:
+  name: ansible
+  config_options:
+    defaults:
+      collections_path: collections
+      roles_path: ../..
+  playbooks:
+    converge: playbook.yml
+  env:
+    ANSIBLE_CONFIG: ../../ansible.cfg
+    ANSIBLE_COLLECTIONS_PATH: ../../collections
+    ANSIBLE_ROLES_PATH: ../..
+
+verifier:
+  name: ansible
+
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml

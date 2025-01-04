@@ -1,0 +1,17 @@
+---
+base_users: []
+base_default_packages:
+  - ethtool
+  - jq
+  - less
+  - lsof
+  - rsync
+  - sudo
+  - tcpdump
+  - tmux
+  - vim
+base_packages: []
+base_deny_default_packages: []
+base_deny_packages: []
+base_apt_keys: []
+base_apt_repos: []

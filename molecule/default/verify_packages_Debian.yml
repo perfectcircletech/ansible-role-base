@@ -1,0 +1,66 @@
+---
+- name: verify base packages configuration block
+  block:
+    - name: load role defaults
+      ansible.builtin.include_vars:
+        file: "../../defaults/main.yml"
+
+    # Test: Ensure APT keys are added
+    - name: check APT keys
+      ansible.builtin.shell: |
+        apt-key list | grep "{{ k.id }}"
+      loop: "{{ base_apt_keys }}"
+      loop_control:
+        loop_var: k
+      register: apt_keys_check
+      failed_when: apt_keys_check.stdout.find(k.id) == -1
+      changed_when: false
+      when: base_apt_keys | length > 0
+
+    # Test: Ensure APT repositories are configured
+    - name: verify APT repositories
+      ansible.builtin.shell: |
+        grep -r "{{ r.repo }}" /etc/apt/sources.list /etc/apt/sources.list.d/
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: r
+      register: apt_repos_check
+      failed_when: apt_repos_check.stdout.find(r.repo) == -1
+      changed_when: false
+
+    # Test: Ensure default base packages are installed
+    - name: check installed default base packages
+      ansible.builtin.shell: |
+        dpkg -l | grep -E "{{ item }}"
+      loop: "{{ base_default_packages }}"
+      register: default_packages_check
+      failed_when: default_packages_check.stdout.find(item) == -1
+      changed_when: false
+
+    # Test: Ensure additional base packages are installed
+    - name: check installed additional base packages
+      ansible.builtin.shell: |
+        dpkg -l | grep -E "{{ item }}"
+      loop: "{{ base_packages }}"
+      register: additional_packages_check
+      failed_when: additional_packages_check.stdout.find(item) == -1
+      changed_when: false
+
+    # Test: Ensure default forbidden packages are removed
+    - name: check removed default forbidden packages
+      ansible.builtin.shell: |
+        dpkg -l | grep -E "{{ item }}"
+      loop: "{{ base_deny_default_packages }}"
+      register: removed_default_packages_check
+      failed_when: removed_default_packages_check.stdout.find(item) != -1
+      changed_when: false
+
+    # Test: Ensure additional forbidden packages are removed
+    - name: check removed additional forbidden packages
+      ansible.builtin.shell: |
+        dpkg -l | grep -E "{{ item }}"
+      loop: "{{ base_deny_packages }}"
+      register: removed_additional_packages_check
+      failed_when: removed_additional_packages_check.stdout.find(item) != -1
+      changed_when: false
+  when: ansible_pkg_mgr == 'apt'

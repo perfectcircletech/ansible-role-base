@@ -1,0 +1,35 @@
+---
+- name: maintain base users
+  block:
+    - name: create group
+      group:
+        name: "{{ user.name }}"
+        gid: "{{ user.gid | default(omit) }}"
+    - name: create user
+      ansible.builtin.user:
+        name: "{{ user.name }}"
+        uid: "{{ user.uid | default(omit) }}"
+        group: "{{ user.name }}"
+        groups: "{{ user.groups | default(omit) }}"
+        append: "{{ user.append | default(true) }}"
+        comment: "{{ user.comment | default(omit) }}"
+        create_home: "{{ user.create_home | default(true) }}"
+        shell: "{{ user.shell | default('/bin/bash') }}"
+
+    - name: create .ssh directory
+      ansible.builtin.file:
+        path: "/home/{{ user.name }}/.ssh"
+        state: directory
+        owner: "{{ user.name }}"
+        group: "{{ user.name }}"
+        mode: "0700"
+
+    - name: configure authorized keys from GitHub
+      ansible.posix.authorized_key:
+        user: "{{ user.name }}"
+        state: present
+        key: "https://github.com/{{ user.git_profile }}.keys"
+      when:
+        user.git_profile | length > 0
+  tags:
+    - base-users

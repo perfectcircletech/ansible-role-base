@@ -1,0 +1,85 @@
+---
+- name: maintain base packages
+  block:
+    # force update for apt keys to avoid `apt update` failures during --check
+    - name: update check for apt keys
+      apt_key:
+        id: "{{ k.id | default(omit) }}"
+        url: "{{ k.url | default(omit) }}"
+        file: "{{ k.file | default(omit) }}"
+        data: "{{ k.data | default(omit) }}"
+        state: "{{ k.state | default(omit) }}"
+        keyring: "{{ k.keyring | default(omit) }}"
+        keyserver: "{{ k.keyserver | default(omit) }}"
+        validate_certs: "{{ k.validate_certs | default(omit) }}"
+      loop: "{{ base_apt_keys }}"
+      loop_control:
+        loop_var: k
+      check_mode: no
+      when: ansible_pkg_mgr == 'apt'
+      register: _install_apt_keys
+      until: _install_apt_keys is success
+      retries: 5
+      delay: 2
+
+    - name: configure additional APT repos
+      apt_repository:
+        codename: "{{ r.codename | default(omit) }}"
+        filename: "{{ r.filename | default(omit) }}"
+        install_python_apt: "{{ r.install_python_apt | default(omit) }}"
+        mode: "{{ r.mode | default(omit) }}"
+        repo: "{{ r.repo | default(omit) }}"
+        state: "{{ r.state | default(omit) }}"
+        update_cache: "{{ r.update_cache | default(omit) }}"
+        update_cache_retries: "{{ r.update_cache_retries | default(omit) }}"
+        update_cache_retry_max_delay: "{{ r.update_cache_retry_max_delay | default(omit) }}"
+        validate_certs: "{{ r.validate_certs | default(omit) }}"
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: r
+      when: ansible_pkg_mgr == 'apt'
+
+    - name: install default base packages
+      ansible.builtin.apt:
+        pkg: "{{ base_default_packages }}"
+        update_cache: true
+      when: ansible_pkg_mgr == 'apt'
+      register: _install_default_base_packages
+      until: _install_default_base_packages is success
+      retries: 5
+      delay: 2
+
+    - name: install additional base packages
+      ansible.builtin.apt:
+        pkg: "{{ base_packages }}"
+      when: ansible_pkg_mgr == 'apt'
+      register: _install_base_packages
+      until: _install_base_packages is success
+      retries: 5
+      delay: 2
+
+    - name: remove default forbidden packages
+      ansible.builtin.apt:
+        pkg: "{{ base_deny_default_packages }}"
+        purge: yes
+        state: absent
+        autoremove: yes
+      when: ansible_pkg_mgr == 'apt'
+      register: _remove_deny_default_packages
+      until: _remove_deny_default_packages is success
+      retries: 5
+      delay: 2
+
+    - name: remove additional forbidden packages
+      ansible.builtin.apt:
+        pkg: "{{ base_deny_packages }}"
+        purge: yes
+        state: absent
+        autoremove: yes
+      when: ansible_pkg_mgr == 'apt'
+      register: _remove_deny_packages
+      until: _remove_deny_packages is success
+      retries: 5
+      delay: 2
+  tags:
+    - base-packages
