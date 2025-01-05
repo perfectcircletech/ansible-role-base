@@ -15,6 +15,15 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 ## Example usage
 
 ```yaml
+- hosts: all
+  become: true
+  roles:
+    - role: perfectcircletech.ansible-role-base
+  tags:
+    - base
+```
+
+```yaml
 base_users:
   - name: johndoe
     comment: John Doe
@@ -41,6 +50,23 @@ base_apt_keys:
 base_apt_repos:
   - repo: "deb https://deb.nodesource.com/node_18.x nodistro main"
     state: present
+```
+
+## Install
+
+Add role to requirements file
+
+```yaml
+roles:
+  - name: "perfectcircletech.ansible-role-base"
+    src: "git+https://github.com/perfectcircletech/ansible-role-base.git"
+    version: "0.1.0"
+```
+
+and install via `ansible-galaxy`
+
+```bash
+ansible-galaxy install -r roles/requirements.yaml
 ```
 
 ## Testing
