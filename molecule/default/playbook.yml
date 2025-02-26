@@ -3,7 +3,7 @@
   hosts: all
   become: true
   roles:
-    - role: perfectcircletech.base
+    - role: .
       vars:
         base_users:
           - name: mbr
