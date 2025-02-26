@@ -48,3 +48,30 @@
   tasks:
     - name: Verify base packages configuration
       ansible.builtin.include_tasks: verify_packages_{{ ansible_facts.os_family }}.yml
+
+- name: Verify base resolv.conf configuration
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check if resolv.conf exists
+      ansible.builtin.stat:
+        path: /etc/resolv.conf.check
+      register: resolv_conf
+
+    - name: Fail if resolv.conf is missing
+      fail:
+        msg: "File /etc/resolv.conf.check is missing!"
+      when: not resolv_conf.stat.exists
+
+    - name: Read resolv.conf
+      command: cat /etc/resolv.conf.check
+      register: resolv_conf_content
+      changed_when: false
+
+    - name: Validate nameservers
+      assert:
+        that:
+          - "'nameserver 1.1.1.1' in resolv_conf_content.stdout"
+          - "'nameserver 8.8.8.8' in resolv_conf_content.stdout"
+          - "'search perfectcircle.tech' in resolv_conf_content.stdout"
+          - "'options timeout:2 attempts:3' in resolv_conf_content.stdout"

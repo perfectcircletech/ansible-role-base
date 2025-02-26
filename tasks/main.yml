@@ -12,3 +12,11 @@
   ansible.builtin.include_tasks: packages.yml
   tags:
     - base-packages
+
+- name: Maintain resolv.conf
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: "{{ base_resolv_conf_path }}"
+    owner: root
+    group: root
+    mode: '0644'

@@ -19,3 +19,7 @@
         base_apt_repos:
           - repo: "deb https://deb.nodesource.com/node_18.x nodistro main"
             state: present
+        base_resolv_conf_path: /etc/resolv.conf.check
+        base_resolv_search_domains:
+          - perfectcircle.tech
+          - example.com

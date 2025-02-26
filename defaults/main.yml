@@ -15,3 +15,10 @@ base_deny_default_packages: []
 base_deny_packages: []
 base_apt_keys: []
 base_apt_repos: []
+# resolv.conf settings
+base_resolv_conf_path: "/etc/resolv.conf"
+base_resolv_nameservers:
+  - 1.1.1.1
+  - 8.8.8.8
+base_resolv_search_domains: []
+base_resolv_options: "timeout:2 attempts:3"
