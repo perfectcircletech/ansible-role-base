@@ -59,17 +59,17 @@
       register: resolv_conf
 
     - name: Fail if resolv.conf is missing
-      fail:
+      ansible.builtin.fail:
         msg: "File /etc/resolv.conf.check is missing!"
       when: not resolv_conf.stat.exists
 
     - name: Read resolv.conf
-      command: cat /etc/resolv.conf.check
+      ansible.builtin.command: cat /etc/resolv.conf.check
       register: resolv_conf_content
       changed_when: false
 
     - name: Validate nameservers
-      assert:
+      ansible.builtin.assert:
         that:
           - "'nameserver 1.1.1.1' in resolv_conf_content.stdout"
           - "'nameserver 8.8.8.8' in resolv_conf_content.stdout"
