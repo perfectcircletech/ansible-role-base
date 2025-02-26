@@ -11,6 +11,10 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 | `base_deny_packages`         | List of additional forbidden packages for deinstallation | `[]`                          |
 | `base_apt_keys`              | List of APT repos keys                                   | `[]`                          |
 | `base_apt_repos`             | List of APT repos                                        | `[]`                          |
+| `base_resolv_conf_path`      | Destination path of resolv.conf                          | `/etc/resolv.conf`            |
+| `base_resolv_nameservers`    | List of nameservers for resolv.conf                      | `['1.1.1.1', '8.8.8.8']`      |
+| `base_resolv_search_domains` | List of search domain for resolv.conf                    | `[]`                          |
+| `base_resolv_options`        | Options for resolv.conf                                  | `timeout:2 attempts:3`        |
 
 ## Example usage
 
@@ -52,6 +56,14 @@ base_apt_repos:
     state: present
 ```
 
+```yaml
+base_resolv_nameservers:
+  - 192.168.0.1
+  - 192.0.2.1
+base_resolv_search_domains:
+  - example.com
+```
+
 ## Install
 
 Add role to requirements file
@@ -73,7 +85,7 @@ ansible-galaxy install -r roles/requirements.yaml
 
 Use [molecule](https://ansible.readthedocs.io/projects/molecule/).
 
-#### Install to venv
+### Install to venv
 
 ```bash
 python3 -m venv venv
@@ -81,7 +93,7 @@ source venv/bin/activate
 pip install -r molecule/requirements.txt
 ```
 
-#### Example
+#### Testing Example
 
 ```bash
 molecule test
@@ -91,7 +103,7 @@ molecule test
 
 Use [ansible-lint](https://ansible.readthedocs.io/projects/lint/) and [yamllint](https://yamllint.readthedocs.io/en/stable/).
 
-#### Example
+### Linting Example
 
 ```bash
 ansible-lint -v
