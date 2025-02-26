@@ -8,5 +8,6 @@ rules:
 
 ignore: |
   .github/workflows/stale.yml
+  .github/workflows/molecule.yml
   collections
   venv
