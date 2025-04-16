@@ -1,14 +1,18 @@
 ---
-- name: Maintain base users
+- name: Create base users
+  when:
+    user.state == "present"
   tags:
     - base-users
   block:
     - name: Create group
       ansible.builtin.group:
+        state: "{{ user.state | default('present') }}"
         name: "{{ user.name }}"
         gid: "{{ user.gid | default(omit) }}"
     - name: Create user
       ansible.builtin.user:
+        state: "{{ user.state | default('present') }}"
         name: "{{ user.name }}"
         uid: "{{ user.uid | default(omit) }}"
         group: "{{ user.name }}"
@@ -29,7 +33,39 @@
     - name: Configure authorized keys from GitHub
       ansible.posix.authorized_key:
         user: "{{ user.name }}"
-        state: present
+        state: "{{ user.state | default('present') }}"
         key: "https://github.com/{{ user.git_profile }}.keys"
       when:
-        user.git_profile | length > 0
+        user.git_profile is defined and user.git_profile | length > 0
+
+    - name: Configure authorized keys fom inventory
+      ansible.posix.authorized_key:
+        user: "{{ user.name }}"
+        state: present
+        key: "{{ user.ssh_public_key }}"
+      when:
+        user.ssh_public_key is defined and user.ssh_public_key | length > 0
+
+- name: Delete base users
+  when:
+    user.state == "absent"
+  tags:
+    - base-users
+  block:
+    - name: Delete user
+      ansible.builtin.user:
+        state: "{{ user.state | default('absent') }}"
+        name: "{{ user.name }}"
+        uid: "{{ user.uid | default(omit) }}"
+        group: "{{ user.name }}"
+        groups: "{{ user.groups | default(omit) }}"
+        append: "{{ user.append | default(true) }}"
+        comment: "{{ user.comment | default(omit) }}"
+        create_home: "{{ user.create_home | default(true) }}"
+        shell: "{{ user.shell | default('/bin/bash') }}"
+        remove: true
+    - name: Delete group
+      ansible.builtin.group:
+        state: "{{ user.state | default('absent') }}"
+        name: "{{ user.name }}"
+        gid: "{{ user.gid | default(omit) }}"
