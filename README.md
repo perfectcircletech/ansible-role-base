@@ -30,12 +30,15 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 ```yaml
 base_users:
   - name: johndoe
+    state: present
     comment: John Doe
     groups:
       - sudo
     shell: /bin/bash
     create_home: true
     git_profile: johndoe
+    ssh_public_key: >
+      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMnv7KaaCyjLo4M7/Qq/Lf/i7wwgBnCFArnmytFFGmmmg
 ```
 
 ```yaml
