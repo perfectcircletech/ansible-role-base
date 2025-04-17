@@ -4,6 +4,7 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 
 | Variable                     | Description                                              | Default                       |
 |:----------------------------:|:--------------------------------------------------------:|:-----------------------------:|
+| `base_default_users`         | List of default users                                    | `[]`                          |
 | `base_users`                 | List of users                                            | `[]`                          |
 | `base_default_packages`      | List of default packages for installation                | [link](defaults/main.yaml#L3) |
 | `base_packages`              | List of additional packages for installation             | `[]`                          |

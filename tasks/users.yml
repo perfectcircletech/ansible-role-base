@@ -1,7 +1,7 @@
 ---
 - name: Create base users
   when:
-    user.state == "present"
+    user.state is defined and user.state == "present"
   tags:
     - base-users
   block:
@@ -48,7 +48,7 @@
 
 - name: Delete base users
   when:
-    user.state == "absent"
+    user.state is defined and user.state == "absent"
   tags:
     - base-users
   block:

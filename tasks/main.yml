@@ -1,10 +1,19 @@
 ---
+- name: Maintain base default users
+  ansible.builtin.include_tasks: users.yml
+  when: base_default_users | length > 0
+  loop: "{{ base_default_users }}"
+  loop_control:
+    loop_var: user
+  tags:
+    - base-users
+
 - name: Maintain base users
   ansible.builtin.include_tasks: users.yml
   when: base_users | length > 0
+  loop: "{{ base_users }}"
   loop_control:
     loop_var: user
-  loop: "{{ base_users }}"
   tags:
     - base-users
 

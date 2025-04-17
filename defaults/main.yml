@@ -1,5 +1,6 @@
 ---
 base_users: []
+base_default_users: []
 base_default_packages:
   - ethtool
   - jq
