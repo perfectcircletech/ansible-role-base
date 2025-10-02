@@ -9,10 +9,6 @@ platforms:
     privileged: true
     build:
       context: .
-  - name: instance_almalinux_9
-    image: almalinux:9
-    pre_build_image: false
-    privileged: true
 
 provisioner:
   name: ansible
