@@ -21,5 +21,6 @@ base_resolv_conf_path: "/etc/resolv.conf"
 base_resolv_nameservers:
   - 1.1.1.1
   - 8.8.8.8
+base_resolv_domain: ""
 base_resolv_search_domains: []
 base_resolv_options: "timeout:2 attempts:3"
