@@ -10,6 +10,13 @@ platforms:
     build:
       context: .
 
+  - name: instance_debian_13
+    image: debian:13
+    pre_build_image: false
+    privileged: true
+    build:
+      context: .
+
 provisioner:
   name: ansible
   config_options:
