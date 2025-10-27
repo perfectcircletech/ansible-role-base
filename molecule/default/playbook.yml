@@ -14,11 +14,10 @@
             groups: "{{ 'wheel' if ansible_facts.os_family == 'RedHat' else 'sudo' }}"
             shell: /bin/bash
             git_profile: nemca
-        base_apt_keys:
-          - url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
-            state: present
         base_apt_repos:
-          - repo: "deb https://deb.nodesource.com/node_18.x nodistro main"
+          - name: nodesource
+            repo: "https://deb.nodesource.com/node_20.x nodistro main"
+            key: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
             state: present
         base_resolv_conf_path: /etc/resolv.conf.check
         base_resolv_domain: "example.com"

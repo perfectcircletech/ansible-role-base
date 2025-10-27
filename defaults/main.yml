@@ -14,7 +14,6 @@ base_default_packages:
 base_packages: []
 base_deny_default_packages: []
 base_deny_packages: []
-base_apt_keys: []
 base_apt_repos: []
 # resolv.conf settings
 base_resolv_conf_path: "/etc/resolv.conf"

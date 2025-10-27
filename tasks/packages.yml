@@ -4,42 +4,68 @@
   tags:
     - base-packages
   block:
-    # force update for apt keys to avoid `apt update` failures during --check
-    - name: Update check for apt keys
-      ansible.builtin.apt_key:
-        id: "{{ k.id | default(omit) }}"
-        url: "{{ k.url | default(omit) }}"
-        file: "{{ k.file | default(omit) }}"
-        data: "{{ k.data | default(omit) }}"
-        state: "{{ k.state | default(omit) }}"
-        keyring: "{{ k.keyring | default(omit) }}"
-        keyserver: "{{ k.keyserver | default(omit) }}"
-        validate_certs: "{{ k.validate_certs | default(omit) }}"
-      loop: "{{ base_apt_keys }}"
+    - name: Ensure keyrings directory exists
+      ansible.builtin.file:
+        path: /usr/share/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download ASCII-armored GPG keys
+      ansible.builtin.get_url:
+        url: "{{ k.key }}"
+        dest: "/usr/share/keyrings/{{ k.name }}.asc"
+        mode: '0644'
+      loop: "{{ base_apt_repos }}"
       loop_control:
         loop_var: k
       check_mode: false
       when: ansible_pkg_mgr == 'apt'
-      register: _install_apt_keys
-      until: _install_apt_keys is success
+      register: _keys_dl
+      until: _keys_dl is success
       retries: 5
       delay: 2
 
-    - name: Configure additional APT repos
-      ansible.builtin.apt_repository:
-        codename: "{{ r.codename | default(omit) }}"
-        filename: "{{ r.filename | default(omit) }}"
-        install_python_apt: "{{ r.install_python_apt | default(omit) }}"
-        mode: "{{ r.mode | default(omit) }}"
-        repo: "{{ r.repo | default(omit) }}"
-        state: "{{ r.state | default(omit) }}"
-        update_cache: "{{ r.update_cache | default(omit) }}"
-        update_cache_retries: "{{ r.update_cache_retries | default(omit) }}"
-        update_cache_retry_max_delay: "{{ r.update_cache_retry_max_delay | default(omit) }}"
-        validate_certs: "{{ r.validate_certs | default(omit) }}"
+    - name: Stat dearmored key
+      ansible.builtin.stat:
+        path: "/usr/share/keyrings/{{ k.name }}.gpg"
       loop: "{{ base_apt_repos }}"
       loop_control:
-        loop_var: r
+        loop_var: k
+      register: _keys_gpg_stat
+
+    - name: Dearmor GPG key only when needed
+      ansible.builtin.shell: |
+        set -e
+        TMP="/usr/share/keyrings/{{ k.name }}.gpg.tmp"
+        gpg --dearmor --yes -o "$TMP" "/usr/share/keyrings/{{ k.name }}.asc"
+        if ! cmp -s "$TMP" "/usr/share/keyrings/{{ k.name }}.gpg"; then
+          mv "$TMP" "/usr/share/keyrings/{{ k.name }}.gpg"
+          echo changed
+        else
+          rm -f "$TMP"
+        fi
+      args:
+        executable: /bin/bash
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: k
+        index_var: idx
+      register: _dearmor
+      changed_when: "'changed' in _dearmor.stdout"
+      when:
+        - ansible_pkg_mgr == 'apt'
+        - _keys_dl.results[idx].changed | default(false)
+          or not _keys_gpg_stat.results[idx].stat.exists
+
+    - name: Add apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/{{ k.name }}.gpg] {{ k.repo }}"
+        filename: "{{ k.name }}"
+        state: present
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: k
+      check_mode: false
       when: ansible_pkg_mgr == 'apt'
 
     - name: Install default base packages

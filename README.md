@@ -10,7 +10,6 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 | `base_packages`              | List of additional packages for installation             | `[]`                          |
 | `base_deny_default_packages` | List of forbidden packages for deinstallation            | `[]`                          |
 | `base_deny_packages`         | List of additional forbidden packages for deinstallation | `[]`                          |
-| `base_apt_keys`              | List of APT repos keys                                   | `[]`                          |
 | `base_apt_repos`             | List of APT repos                                        | `[]`                          |
 | `base_resolv_conf_path`      | Destination path of resolv.conf                          | `/etc/resolv.conf`            |
 | `base_resolv_nameservers`    | List of nameservers for resolv.conf                      | `['1.1.1.1', '8.8.8.8']`      |
@@ -50,14 +49,10 @@ base_packages:
 ```
 
 ```yaml
-base_apt_keys:
-  - url: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
-    state: present
-```
-
-```yaml
 base_apt_repos:
-  - repo: "deb https://deb.nodesource.com/node_18.x nodistro main"
+  - name: nodesource
+    repo: "https://deb.nodesource.com/node_18.x nodistro main"
+    key: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
     state: present
 ```
 

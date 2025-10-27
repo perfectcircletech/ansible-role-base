@@ -6,28 +6,80 @@
       ansible.builtin.include_vars:
         file: "../../defaults/main.yml"
 
-    # Test: Ensure APT keys are added
-    - name: check APT keys
-      ansible.builtin.shell: |
-        apt-key list | grep "{{ k.id }}"
-      loop: "{{ base_apt_keys }}"
-      loop_control:
-        loop_var: k
-      register: apt_keys_check
-      failed_when: apt_keys_check.stdout.find(k.id) == -1
-      changed_when: false
-      when: base_apt_keys | length > 0
-
-    # Test: Ensure APT repositories are configured
-    - name: verify APT repositories
-      ansible.builtin.shell: |
-        grep -r "{{ r.repo }}" /etc/apt/sources.list /etc/apt/sources.list.d/
+    - name: Check keyring file exists
+      ansible.builtin.stat:
+        path: "/usr/share/keyrings/{{ k.name }}.gpg"
       loop: "{{ base_apt_repos }}"
       loop_control:
-        loop_var: r
-      register: apt_repos_check
-      failed_when: apt_repos_check.stdout.find(r.repo) == -1
+        loop_var: k
+      register: _keyring_stat
+
+    - name: Assert keyring file present
+      ansible.builtin.assert:
+        that:
+          - _keyring_stat.results[idx].stat.exists
+          - _keyring_stat.results[idx].stat.isreg
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: k
+        index_var: idx
+
+    - name: Read GPG fingerprint (if k.id provided)
+      ansible.builtin.shell: >
+        gpg --show-keys --with-colons /usr/share/keyrings/{{ k.name }}.gpg
+        | awk -F: '/^fpr:/ {print toupper($10); exit}'
+      args:
+        executable: /bin/bash
+      register: _gpg_fpr
       changed_when: false
+      failed_when: false
+      when: k.id is defined and k.id|length > 0
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: k
+
+    - name: Assert fingerprint matches (if provided)
+      ansible.builtin.assert:
+        that:
+          - >
+            (_gpg_fpr.results[idx].stdout|trim) is match('^' ~ (k.id|string|upper|replace(" ","")) ~ '$')
+            or (_gpg_fpr.results[idx].stdout|trim)[-16:] == (k.id|string|upper|replace(" ",""))[-16:]
+      when: k.id is defined and k.id|length > 0
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: k
+        index_var: idx
+
+    - name: Stat repo file
+      ansible.builtin.stat:
+        path: "/etc/apt/sources.list.d/{{ k.name }}.list"
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: k
+      register: _repo_stat
+
+    - name: Read repo file
+      ansible.builtin.slurp:
+        path: "/etc/apt/sources.list.d/{{ k.name }}.list"
+      when: _repo_stat.results[idx].stat.exists
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: k
+        index_var: idx
+      register: _repo_slurp
+
+    - name: Assert repo has signed-by and correct repo string
+      ansible.builtin.assert:
+        that:
+          - _repo_stat.results[idx].stat.exists
+          - >
+            ( (_repo_slurp.results[idx].content | b64decode)
+              is search('signed-by=/usr/share/keyrings/' ~ k.name ~ '\.gpg') )
+          - ( (_repo_slurp.results[idx].content | b64decode) is search(k.repo | regex_escape) )
+      loop: "{{ base_apt_repos }}"
+      loop_control:
+        loop_var: k
+        index_var: idx
 
     # Test: Ensure default base packages are installed
     - name: check installed default base packages
