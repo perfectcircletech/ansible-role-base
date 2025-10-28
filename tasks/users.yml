@@ -10,6 +10,7 @@
         state: "{{ user.state | default('present') }}"
         name: "{{ user.name }}"
         gid: "{{ user.gid | default(omit) }}"
+        system: "{{ user.system | default(false) }}"
     - name: Create user
       ansible.builtin.user:
         state: "{{ user.state | default('present') }}"
@@ -21,6 +22,7 @@
         comment: "{{ user.comment | default(omit) }}"
         create_home: "{{ user.create_home | default(true) }}"
         shell: "{{ user.shell | default('/bin/bash') }}"
+        system: "{{ user.system | default(false) }}"
 
     - name: Create .ssh directory
       ansible.builtin.file:
