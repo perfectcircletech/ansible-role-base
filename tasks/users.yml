@@ -20,6 +20,7 @@
         groups: "{{ user.groups | default(omit) }}"
         append: "{{ user.append | default(true) }}"
         comment: "{{ user.comment | default(omit) }}"
+        home: "{{ user.home | default(omit) }}"
         create_home: "{{ user.create_home | default(true) }}"
         shell: "{{ user.shell | default('/bin/bash') }}"
         system: "{{ user.system | default(false) }}"
@@ -63,6 +64,7 @@
         groups: "{{ user.groups | default(omit) }}"
         append: "{{ user.append | default(true) }}"
         comment: "{{ user.comment | default(omit) }}"
+        home: "{{ user.home | default(omit) }}"
         create_home: "{{ user.create_home | default(true) }}"
         shell: "{{ user.shell | default('/bin/bash') }}"
         remove: true
