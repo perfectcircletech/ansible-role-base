@@ -4,6 +4,15 @@
   tags:
     - base-packages
   block:
+    - name: Ensure dependency packages installed
+      ansible.builtin.apt:
+        pkg: gpg
+      when: ansible_pkg_mgr == 'apt'
+      register: _install_deps_packages
+      until: _install_deps_packages is success
+      retries: 5
+      delay: 2
+
     - name: Ensure keyrings directory exists
       ansible.builtin.file:
         path: /usr/share/keyrings
