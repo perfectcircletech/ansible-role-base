@@ -15,6 +15,10 @@ base_packages: []
 base_deny_default_packages: []
 base_deny_packages: []
 base_apt_repos: []
+# hosts
+base_hostname: "hostname"
+base_domainname: "example.com"
+base_hosts_entries: []
 # resolv.conf settings
 base_resolv_conf_path: "/etc/resolv.conf"
 base_resolv_nameservers:

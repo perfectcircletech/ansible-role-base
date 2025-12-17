@@ -49,6 +49,31 @@
     - name: Verify base packages configuration
       ansible.builtin.include_tasks: verify_packages_{{ ansible_facts.os_family }}.yml
 
+- name: Verify base /etc/hosts configuration
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check if /etc/hosts exists
+      ansible.builtin.stat:
+        path: /etc/hosts.check
+      register: _hosts
+
+    - name: Fail if resolv.conf is missing
+      ansible.builtin.fail:
+        msg: "File /etc/resolv.conf.check is missing!"
+      when: not _hosts.stat.exists
+
+    - name: Read /etc/hosts
+      ansible.builtin.command: cat /etc/hosts.check
+      register: _hosts_content
+      changed_when: false
+
+    - name: Validate nameservers
+      ansible.builtin.assert:
+        that:
+          - "'127.0.1.1       d01.domain.example.com d01' in _hosts_content.stdout"
+          - "'192.0.2.1       domain.example.com  # Domain comment' in _hosts_content.stdout"
+
 - name: Verify base resolv.conf configuration
   hosts: all
   gather_facts: false
@@ -56,22 +81,22 @@
     - name: Check if resolv.conf exists
       ansible.builtin.stat:
         path: /etc/resolv.conf.check
-      register: resolv_conf
+      register: _resolv_conf
 
     - name: Fail if resolv.conf is missing
       ansible.builtin.fail:
         msg: "File /etc/resolv.conf.check is missing!"
-      when: not resolv_conf.stat.exists
+      when: not _resolv_conf.stat.exists
 
     - name: Read resolv.conf
       ansible.builtin.command: cat /etc/resolv.conf.check
-      register: resolv_conf_content
+      register: _resolv_conf_content
       changed_when: false
 
     - name: Validate nameservers
       ansible.builtin.assert:
         that:
-          - "'nameserver 1.1.1.1' in resolv_conf_content.stdout"
-          - "'nameserver 8.8.8.8' in resolv_conf_content.stdout"
-          - "'search perfectcircle.tech' in resolv_conf_content.stdout"
-          - "'options timeout:2 attempts:3' in resolv_conf_content.stdout"
+          - "'nameserver 1.1.1.1' in _resolv_conf_content.stdout"
+          - "'nameserver 8.8.8.8' in _resolv_conf_content.stdout"
+          - "'search perfectcircle.tech example.com' in _resolv_conf_content.stdout"
+          - "'options timeout:2 attempts:3' in _resolv_conf_content.stdout"

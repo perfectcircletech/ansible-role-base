@@ -11,6 +11,9 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 | `base_deny_default_packages` | List of forbidden packages for deinstallation            | `[]`                          |
 | `base_deny_packages`         | List of additional forbidden packages for deinstallation | `[]`                          |
 | `base_apt_repos`             | List of APT repos                                        | `[]`                          |
+| `base_hostname`              | Host name                                                | `"hostname"`                  |
+| `base_domainname`            | Domain name                                              | `"example.com"`               |
+| `base_hosts_entries`         | Hosts file entries                                       | `[]`                          |
 | `base_resolv_conf_path`      | Destination path of resolv.conf                          | `/etc/resolv.conf`            |
 | `base_resolv_nameservers`    | List of nameservers for resolv.conf                      | `['1.1.1.1', '8.8.8.8']`      |
 | `base_resolv_search_domains` | List of search domain for resolv.conf                    | `[]`                          |
@@ -56,6 +59,16 @@ base_apt_repos:
 ```
 
 ```yaml
+base_hostname: d01
+base_domainname: domain.example.com
+
+base_hosts_entries:
+  - ip: 192.0.2.1
+    names: [domain.example.com, domain]
+    comment: Some domain
+```
+
+```yaml
 base_resolv_nameservers:
   - 192.168.0.1
   - 192.0.2.1
@@ -92,10 +105,20 @@ source venv/bin/activate
 pip install -r molecule/requirements.txt
 ```
 
-#### Testing Example
+### Testing Example
 
 ```bash
 molecule test
+```
+
+### Testing step by step
+
+```bash
+molecule create
+molecule converge
+molecule idempotence
+molecule verify
+molecule destroy
 ```
 
 ## Linting

@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+# Host: {{ base_hostname }}
+# FQDN: {{ base_fqdn }}
+
+{{ "%-15s" | format('127.0.0.1') }} localhost
+{{ "%-15s" | format('::1') }} localhost ip6-localhost ip6-loopback
+{{ "%-15s" | format('ff02::1') }} ip6-allnodes
+{{ "%-15s" | format('ff02::2') }} ip6-allrouters
+
+{{ "%-15s" | format('127.0.1.1') }} {{ base_fqdn }} {{ base_hostname }}
+
+{% for e in base_hosts_entries | default([]) %}
+{{ "%-15s" | format(e.ip) }} {{ (e.names | default([])) | join(' ') }}{% if e.comment is defined and e.comment|length > 0 %}  # {{ e.comment }}{% endif %}
+{% endfor %}

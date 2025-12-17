@@ -1,6 +1,6 @@
 {{ ansible_managed | comment }}
 
-{% for ns in base_resolv_nameservers %}
+{% for ns in base_nameservers %}
 nameserver {{ ns }}
 {% endfor %}
 {%- if base_resolv_search_domains | default('') | length >0 -%}

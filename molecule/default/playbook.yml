@@ -19,7 +19,14 @@
             repo: "https://deb.nodesource.com/node_20.x nodistro main"
             key: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
             state: present
+        base_hostname: d01
+        base_domainname: domain.example.com
+        base_hosts_path: /etc/hosts.check
         base_resolv_conf_path: /etc/resolv.conf.check
         base_resolv_search_domains:
           - perfectcircle.tech
           - example.com
+        base_hosts_entries:
+          - ip: 192.0.2.1
+            names: [domain.example.com]
+            comment: Domain comment
