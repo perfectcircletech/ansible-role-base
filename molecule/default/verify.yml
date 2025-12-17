@@ -73,6 +73,5 @@
         that:
           - "'nameserver 1.1.1.1' in resolv_conf_content.stdout"
           - "'nameserver 8.8.8.8' in resolv_conf_content.stdout"
-          - "'domain example.com' in resolv_conf_content.stdout"
           - "'search perfectcircle.tech' in resolv_conf_content.stdout"
           - "'options timeout:2 attempts:3' in resolv_conf_content.stdout"

@@ -3,9 +3,6 @@
 {% for ns in base_resolv_nameservers %}
 nameserver {{ ns }}
 {% endfor %}
-{%- if base_resolv_domain | default('') | length >0 -%}
-domain {{ base_resolv_domain }}
-{% endif %}
 {%- if base_resolv_search_domains | default('') | length >0 -%}
 search {{ base_resolv_search_domains | join(' ') }}
 {% endif %}

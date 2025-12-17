@@ -20,7 +20,6 @@
             key: "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
             state: present
         base_resolv_conf_path: /etc/resolv.conf.check
-        base_resolv_domain: "example.com"
         base_resolv_search_domains:
           - perfectcircle.tech
           - example.com

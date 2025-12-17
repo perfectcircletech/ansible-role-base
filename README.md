@@ -13,7 +13,6 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 | `base_apt_repos`             | List of APT repos                                        | `[]`                          |
 | `base_resolv_conf_path`      | Destination path of resolv.conf                          | `/etc/resolv.conf`            |
 | `base_resolv_nameservers`    | List of nameservers for resolv.conf                      | `['1.1.1.1', '8.8.8.8']`      |
-| `base_resolv_domain`         | Domain name for resolv.conf                              | `""`                          |
 | `base_resolv_search_domains` | List of search domain for resolv.conf                    | `[]`                          |
 | `base_resolv_options`        | Options for resolv.conf                                  | `timeout:2 attempts:3`        |
 
