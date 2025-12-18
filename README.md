@@ -11,8 +11,8 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 | `base_deny_default_packages` | List of forbidden packages for deinstallation            | `[]`                                           |
 | `base_deny_packages`         | List of additional forbidden packages for deinstallation | `[]`                                           |
 | `base_apt_repos`             | List of APT repos                                        | `[]`                                           |
-| `base_hostname`              | Host name                                                | `"hostname"`                                   |
-| `base_domainname`            | Domain name                                              | `"example.com"`                                |
+| `base_hostname`              | Host name                                                | `""`                                           |
+| `base_domainname`            | Domain name                                              | `""`                                           |
 | `base_hosts_entries`         | Hosts file entries                                       | `[]`                                           |
 | `base_resolv_conf_path`      | Destination path of resolv.conf                          | `/etc/resolv.conf`                             |
 | `base_resolv_nameservers`    | List of nameservers for resolv.conf                      | `['1.1.1.1', '8.8.8.8']`                       |

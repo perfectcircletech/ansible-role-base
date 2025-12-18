@@ -31,6 +31,7 @@
 - name: Set system hostname (FQDN)
   ansible.builtin.hostname:
     name: "{{ base_fqdn }}"
+  when: base_fqdn|length > 0
 
 - name: Maintain /etc/hosts
   ansible.builtin.template:
