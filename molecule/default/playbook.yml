@@ -30,3 +30,10 @@
           - ip: 192.0.2.1
             names: [domain.example.com]
             comment: Domain comment
+          - ip: 192.0.2.2
+            names: [domain.example.com]
+            comment: Domain comment
+          - ip: 192.0.2.3
+            names: [domain.example.com]
+          - ip: 192.0.2.4
+            names: [domain.example.com]

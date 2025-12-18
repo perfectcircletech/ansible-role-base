@@ -68,11 +68,14 @@
       register: _hosts_content
       changed_when: false
 
-    - name: Validate nameservers
+    - name: Validate hosts
       ansible.builtin.assert:
         that:
           - "'127.0.1.1       d01.domain.example.com d01' in _hosts_content.stdout"
-          - "'192.0.2.1       domain.example.com  # Domain comment' in _hosts_content.stdout"
+          - "'192.0.2.1       domain.example.com # Domain comment' in _hosts_content.stdout"
+          - "'192.0.2.2       domain.example.com # Domain comment' in _hosts_content.stdout"
+          - "'192.0.2.3       domain.example.com' in _hosts_content.stdout"
+          - "'192.0.2.4       domain.example.com' in _hosts_content.stdout"
 
 - name: Verify base resolv.conf configuration
   hosts: all
