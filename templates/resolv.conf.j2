@@ -3,7 +3,7 @@
 {% for ns in base_nameservers %}
 nameserver {{ ns }}
 {% endfor %}
-{%- if base_resolv_search_domains | default('') | length >0 -%}
-search {{ base_resolv_search_domains | join(' ') }}
+{%- if base_search_domains | default('') | length >0 -%}
+search {{ base_search_domains | join(' ') }}
 {% endif %}
 options {{ base_resolv_options | default('timeout:2 attempts:3') }}
