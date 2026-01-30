@@ -14,6 +14,15 @@
             groups: "{{ 'wheel' if ansible_facts.os_family == 'RedHat' else 'sudo' }}"
             shell: /bin/bash
             git_profile: nemca
+          - name: dmisu
+            state: present
+            uid: 1011
+            gid: 1011
+            comment: Dmitry Sukhodoev
+            groups: "{{ 'wheel' if ansible_facts.os_family == 'RedHat' else 'sudo' }}"
+            shell: /bin/bash
+            git_profile: raven428
+            profile_repo: "git@github.com:raven428/profile"
         base_apt_repos:
           - name: nodesource
             repo: "https://deb.nodesource.com/node_20.x nodistro main"

@@ -1,17 +1,16 @@
 ---
 - name: Create base users
-  when:
-    user.state is defined and user.state == "present"
+  when: user.state is defined and user.state == "present"
   tags:
     - base-users
   block:
-    - name: Create group
+    - name: "Ensure [{{ user.name }}] group"
       ansible.builtin.group:
         state: "{{ user.state | default('present') }}"
         name: "{{ user.name }}"
         gid: "{{ user.gid | default(omit) }}"
         system: "{{ user.system | default(false) }}"
-    - name: Create user
+    - name: "Ensure [{{ user.name }}] user"
       ansible.builtin.user:
         state: "{{ user.state | default('present') }}"
         name: "{{ user.name }}"
@@ -25,37 +24,90 @@
         shell: "{{ user.shell | default('/bin/bash') }}"
         system: "{{ user.system | default(false) }}"
 
-    - name: Create .ssh directory
+    - name: "Ensure [{{ user.name }}]/.ssh directory"
       ansible.builtin.file:
         path: "/home/{{ user.name }}/.ssh"
         state: directory
         owner: "{{ user.name }}"
         group: "{{ user.name }}"
         mode: "0700"
+      changed_when: false
 
-    - name: Configure authorized keys from GitHub
+    - name: "Ensure [{{ user.name }}] authorized keys from GitHub"
       ansible.posix.authorized_key:
         user: "{{ user.name }}"
         state: "{{ user.state | default('present') }}"
         key: "https://github.com/{{ user.git_profile }}.keys"
       when:
-        user.git_profile is defined and user.git_profile | length > 0
+        - "user.profile_repo | default('') | length <= 0"
+        - "user.git_profile is defined and user.git_profile | length > 0"
 
-    - name: Configure authorized keys fom inventory
+    - name: "Ensure [{{ user.name }}] authorized keys from inventory"
       ansible.posix.authorized_key:
         user: "{{ user.name }}"
         state: present
         key: "{{ user.ssh_public_key }}"
-      when:
-        user.ssh_public_key is defined and user.ssh_public_key | length > 0
+      when: user.ssh_public_key is defined and user.ssh_public_key | length > 0
+
+    - name: Block of sync user profile from git
+      when: "user.profile_repo | default('') | length > 0"
+      block:
+        - name: "Ensure [{{ user.name }}] profile directory"
+          ansible.builtin.file:
+            path: "{{ profile_staging_base }}/{{ inventory_hostname }}/{{ user.name }}"
+            state: directory
+            mode: "0700"
+          delegate_to: localhost
+          check_mode: false
+          become: false
+
+        - name: "Clone [{{ user.name }}] profile repo to staging"
+          ansible.builtin.git:
+            repo: "{{ user.profile_repo }}"
+            dest: "{{ profile_staging_base }}/{{ inventory_hostname }}/{{ user.name }}"
+            accept_newhostkey: true
+            version: "{{ profile_version | default('master') }}"
+            force: true
+          delegate_to: localhost
+          become: false
+          register: _git_repo
+
+        - name: Restore file timestamps from git commits
+          git_restore_timestamps:
+            path: "{{ profile_staging_base }}/{{ inventory_hostname }}/{{ user.name }}"
+          delegate_to: localhost
+          become: false
+
+        - name: "Sync [{{ user.name }}] profile with update preserving newer files"
+          ansible.posix.synchronize:
+            src: "{{ profile_staging_base }}/{{ inventory_hostname }}/{{ user.name }}/."
+            dest: "{{ user.home | default('/home/' ~ user.name) }}/."
+            recursive: true
+            rsync_opts:
+              - "{{ '--force' if _git_repo.changed else '--update' }}"
+              - "--omit-dir-times"
+              - >-
+                --rsh='{{
+                  lookup('env', 'RSYNC_RSH') |
+                  default(
+                    '/usr/bin/env ssh -o HostKeyAlgorithms=ssh-ed25519 ' ~
+                    '-o PreferredAuthentications=publickey ' ~
+                    '-o StrictHostKeyChecking=accept-new',
+                    True
+                  )
+                }}'
+              - "--chmod=u=rwX,g=,o="
+              - "--chown={{ user.uid | default(user.name) }}:{{ user.gid |
+                default(user.name) }}"
+              - "{{ ' ' if _git_repo.changed else '--exclude .git' }}"
+              - "{{ ' ' if _git_repo.changed else '--exclude .ssh' }}"
 
 - name: Delete base users
-  when:
-    user.state is defined and user.state == "absent"
+  when: user.state is defined and user.state == "absent"
   tags:
     - base-users
   block:
-    - name: Delete user
+    - name: "Delete [{{ user.name }}] user"
       ansible.builtin.user:
         state: "{{ user.state | default('absent') }}"
         name: "{{ user.name }}"
@@ -68,7 +120,7 @@
         create_home: "{{ user.create_home | default(true) }}"
         shell: "{{ user.shell | default('/bin/bash') }}"
         remove: true
-    - name: Delete group
+    - name: "Delete [{{ user.name }}] group"
       ansible.builtin.group:
         state: "{{ user.state | default('absent') }}"
         name: "{{ user.name }}"
