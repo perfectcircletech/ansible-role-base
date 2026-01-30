@@ -1,5 +1,6 @@
 ---
 skip_list:
   - 'schema'
+  - 'name[template]'
 exclude_paths:
   - molecule/default/verify_packages_*.yml

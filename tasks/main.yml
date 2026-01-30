@@ -1,4 +1,15 @@
 ---
+- name: Calculate controller temporary directory
+  ansible.builtin.set_fact:
+    profile_staging_base: "/tmp/ansible/controller-{{ lookup('pipe', 'whoami')
+      }}/profiles"
+  delegate_to: localhost
+  check_mode: false
+  run_once: true
+  become: false
+  tags:
+    - base-users
+
 - name: Maintain base default users
   ansible.builtin.include_tasks: users.yml
   when: base_default_users | length > 0

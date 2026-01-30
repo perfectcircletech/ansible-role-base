@@ -19,6 +19,7 @@ platforms:
 
 provisioner:
   name: ansible
+  log: true
   config_options:
     defaults:
       collections_path: collections
@@ -26,6 +27,7 @@ provisioner:
   playbooks:
     converge: playbook.yml
   env:
+    ANSIBLE_VERBOSITY: 1
     ANSIBLE_CONFIG: ../../ansible.cfg
     ANSIBLE_COLLECTIONS_PATH: ../../collections
     ANSIBLE_ROLES_PATH: ../..
