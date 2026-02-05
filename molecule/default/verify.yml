@@ -46,16 +46,16 @@
   hosts: all
   gather_facts: false
   tasks:
-    - name: Verify .git directory exists
+    - name: Verify .gitconfig exists
       ansible.builtin.stat:
-        path: /home/dmisu/.git
-      register: dmisu_git_dir
+        path: /home/dmisu/.gitconfig
+      register: dmisu_gitconfig
 
-    - name: Assert .git directory is present
+    - name: Assert .gitconfig is present
       ansible.builtin.assert:
         that:
-          - dmisu_git_dir.stat.exists
-        fail_msg: ".git directory should be present in home"
+          - dmisu_gitconfig.stat.exists
+        fail_msg: ".gitconfig should be present in home"
 
 - name: Verify base packages configuration
   hosts: all
