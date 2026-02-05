@@ -22,7 +22,7 @@
             groups: "{{ 'wheel' if ansible_facts.os_family == 'RedHat' else 'sudo' }}"
             shell: /bin/bash
             git_profile: raven428
-            profile_repo: "git@github.com:raven428/profile"
+            profile_repo: "https://github.com/raven428/profile.git"
         base_apt_repos:
           - name: nodesource
             repo: "https://deb.nodesource.com/node_20.x nodistro main"
