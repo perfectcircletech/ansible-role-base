@@ -53,7 +53,7 @@
 
 - name: Set system hostname (FQDN)
   ansible.builtin.hostname:
-    name: "{{ base_fqdn }}"
+    name: "{{ base_hostname }}"
   when: base_fqdn|length > 0
 
 - name: Maintain /etc/hosts
