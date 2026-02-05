@@ -72,6 +72,14 @@
           become: false
           register: _git_repo
 
+        - name: "Check [{{ user.name }}] remote special dirs exist"
+          ansible.builtin.stat:
+            path: "{{ user.home | default('/home/' ~ user.name) }}/{{ item }}"
+          loop:
+            - .git
+            - .ssh
+          register: _remote_special_dirs
+
         - name: Restore file timestamps from git commits
           git_restore_timestamps:
             path: "{{ profile_staging_base }}/{{ inventory_hostname }}/{{ user.name }}"
@@ -99,8 +107,24 @@
               - "--chmod=u=rwX,g=,o="
               - "--chown={{ user.uid | default(user.name) }}:{{ user.gid |
                 default(user.name) }}"
-              - "{{ ' ' if _git_repo.changed else '--exclude .git' }}"
-              - "{{ ' ' if _git_repo.changed else '--exclude .ssh' }}"
+              - >-
+                {{
+                  '--exclude .git'
+                  if (not _git_repo.changed and
+                    (_remote_special_dirs.results |
+                      selectattr('item', 'equalto', '.git') |
+                      first).stat.exists)
+                  else ''
+                }}
+              - >-
+                {{
+                  '--exclude .ssh'
+                  if (not _git_repo.changed and
+                    (_remote_special_dirs.results |
+                      selectattr('item', 'equalto', '.ssh') |
+                      first).stat.exists)
+                  else ''
+                }}
 
 - name: Delete base users
   when: user.state is defined and user.state == "absent"
