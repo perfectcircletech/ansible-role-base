@@ -33,28 +33,10 @@
   tags:
     - base-packages
 
-- name: Compute derived facts
-  ansible.builtin.set_fact:
-    base_fqdn: >-
-      {{
-        base_hostname
-      }}{{
-        '.' ~ (base_domainname |
-        trim('.'))
-        if base_domainname |
-        trim('.')
-        else ''
-      }}
-    base_search_domains: "{{ base_resolv_search_domains | default([]) | unique }}"
-    base_nameservers: "{{ base_resolv_nameservers | default([]) | unique }}"
-  tags:
-    - base-hosts
-    - base-resolv
-
 - name: Set system hostname (FQDN)
   ansible.builtin.hostname:
     name: "{{ base_hostname }}"
-  when: base_fqdn|length > 0
+  when: base_hostname|length > 0
 
 - name: Maintain /etc/hosts
   ansible.builtin.template:

@@ -1,4 +1,7 @@
 {{ ansible_managed | comment }}
+{# --- derive base_fqdn inside template --- #}
+{% set _domain = (base_domainname | default('') | trim('.')) %}
+{% set base_fqdn = base_hostname ~ ('.' ~ _domain if _domain else '') %}
 # Host: {{ base_hostname }}
 # FQDN: {{ base_fqdn }}
 
@@ -8,7 +11,11 @@
 {{ "%-15s" | format('ff02::2') }} ip6-allrouters
 
 {% if base_fqdn|length >0 %}
+{% if base_fqdn == base_hostname %}
+{{ "%-15s" | format('127.0.1.1') }} {{ base_hostname }}
+{% else %}
 {{ "%-15s" | format('127.0.1.1') }} {{ base_fqdn }} {{ base_hostname }}
+{% endif %}
 {% endif %}
 
 {% for e in base_hosts_entries | default([]) -%}
