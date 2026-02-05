@@ -63,6 +63,7 @@
     owner: root
     group: root
     mode: '0644'
+    backup: true
   tags:
     - base-hosts
 
@@ -73,5 +74,6 @@
     owner: root
     group: root
     mode: '0644'
+    backup: true
   tags:
     - base-resolv
