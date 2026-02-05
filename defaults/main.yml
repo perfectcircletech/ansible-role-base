@@ -16,7 +16,7 @@ base_deny_default_packages: []
 base_deny_packages: []
 base_apt_repos: []
 # hosts
-base_hostname: ""
+base_hostname: "{{ inventory_hostname_short }}"
 base_domainname: ""
 base_hosts_path: "/etc/hosts"
 base_hosts_entries: []

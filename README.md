@@ -11,7 +11,7 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 | `base_deny_default_packages` | List of forbidden packages for deinstallation            | `[]`                                           |
 | `base_deny_packages`         | List of additional forbidden packages for deinstallation | `[]`                                           |
 | `base_apt_repos`             | List of APT repos                                        | `[]`                                           |
-| `base_hostname`              | Host name                                                | `""`                                           |
+| `base_hostname`              | Host name                                                | `"{{ inventory_hostname_short }}"`             |
 | `base_domainname`            | Domain name                                              | `""`                                           |
 | `base_hosts_path`            | Destination path to hosts file                           | `/etc/hosts`                                   |
 | `base_hosts_entries`         | Hosts file entries                                       | `[]`                                           |
