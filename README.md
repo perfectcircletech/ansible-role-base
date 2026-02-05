@@ -41,6 +41,7 @@ base_users:
     shell: /bin/bash
     create_home: true
     git_profile: johndoe
+    profile_repo: git@github.com:johndoe/profile.git
     ssh_public_key: >
       ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMnv7KaaCyjLo4M7/Qq/Lf/i7wwgBnCFArnmytFFGmmmg
 ```
