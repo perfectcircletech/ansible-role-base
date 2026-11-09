@@ -1,4 +1,9 @@
 ---
+- name: Maintain base packages
+  ansible.builtin.include_tasks: packages.yml
+  tags:
+    - base-packages
+
 - name: Calculate controller temporary directory
   ansible.builtin.set_fact:
     profile_staging_base: "/tmp/ansible/controller-{{ lookup('pipe', 'whoami')
@@ -27,11 +32,6 @@
     loop_var: user
   tags:
     - base-users
-
-- name: Maintain base packages
-  ansible.builtin.include_tasks: packages.yml
-  tags:
-    - base-packages
 
 - name: Set system hostname (FQDN)
   ansible.builtin.hostname:
