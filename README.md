@@ -19,6 +19,10 @@ Role for base configuration the hosts, e.g. users, repos, packages.
 | `base_resolv_nameservers`    | List of nameservers for resolv.conf                      | `['1.1.1.1', '8.8.8.8']`                       |
 | `base_resolv_search_domains` | List of search domain for resolv.conf                    | `[]`                                           |
 | `base_resolv_options`        | Options for resolv.conf                                  | `timeout:2 attempts:3`                         |
+| `base_sysctl_dir`            | Directory for relative sysctl config file names          | `/etc/sysctl.d`                                |
+| `base_sysctl_ignore_errors`  | Ignore errors about unknown sysctl keys                  | `false`                                        |
+| `base_default_sysctl`        | Dict of default sysctl parameters grouped by file        | `{}`                                           |
+| `base_sysctl`                | Dict of additional sysctl parameters grouped by file     | `{}`                                           |
 
 ## Example usage
 
@@ -76,6 +80,22 @@ base_resolv_nameservers:
   - 192.0.2.1
 base_resolv_search_domains:
   - example.com
+```
+
+Sysctl parameters are grouped by config file. Relative file names are placed
+into `base_sysctl_dir`, absolute paths are used as is. `base_sysctl` is merged
+into `base_default_sysctl` recursively, so the same file can be extended and
+the same parameter can be overridden.
+
+```yaml
+base_sysctl:
+  10-network.conf:
+    net.ipv4.ip_forward: 1
+    net.core.somaxconn: 4096
+  20-vm.conf:
+    vm.swappiness: 10
+  /etc/sysctl.conf:
+    kernel.panic: 10
 ```
 
 ## Install

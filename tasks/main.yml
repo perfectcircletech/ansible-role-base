@@ -59,3 +59,8 @@
     backup: true
   tags:
     - base-resolv
+
+- name: Maintain sysctl settings
+  ansible.builtin.include_tasks: sysctl.yml
+  tags:
+    - base-sysctl

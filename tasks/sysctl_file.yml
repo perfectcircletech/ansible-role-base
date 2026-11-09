@@ -1,0 +1,14 @@
+---
+- name: "Maintain sysctl settings in [{{ sysctl_file.key }}]"
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+    sysctl_file: "{{ sysctl_file.key if sysctl_file.key is abs
+      else base_sysctl_dir ~ '/' ~ sysctl_file.key }}"
+    sysctl_set: true
+    reload: true
+    ignoreerrors: "{{ base_sysctl_ignore_errors }}"
+  loop: "{{ sysctl_file.value | dict2items }}"
+  tags:
+    - base-sysctl

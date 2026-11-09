@@ -27,3 +27,8 @@ base_resolv_nameservers:
   - 8.8.8.8
 base_resolv_search_domains: []
 base_resolv_options: "timeout:2 attempts:3"
+# sysctl settings
+base_sysctl_dir: "/etc/sysctl.d"
+base_sysctl_ignore_errors: false
+base_default_sysctl: {}
+base_sysctl: {}

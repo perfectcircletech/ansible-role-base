@@ -46,3 +46,11 @@
             names: [domain.example.com]
           - ip: 192.0.2.4
             names: [domain.example.com]
+        base_default_sysctl:
+          10-network.conf:
+            net.ipv4.ip_forward: 0
+        base_sysctl:
+          10-network.conf:
+            net.ipv4.ip_forward: 1
+          /etc/sysctl.d/20-net-core.conf:
+            net.core.somaxconn: 4096

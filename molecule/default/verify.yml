@@ -118,3 +118,34 @@
           - "'nameserver 8.8.8.8' in _resolv_conf_content.stdout"
           - "'search perfectcircle.tech example.com' in _resolv_conf_content.stdout"
           - "'options timeout:2 attempts:3' in _resolv_conf_content.stdout"
+
+- name: Verify base sysctl configuration
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Read sysctl configs
+      ansible.builtin.command: "cat /etc/sysctl.d/{{ item }}"
+      loop:
+        - 10-network.conf
+        - 20-net-core.conf
+      register: _sysctl_conf_content
+      changed_when: false
+
+    - name: Validate sysctl configs
+      ansible.builtin.assert:
+        that:
+          - "'net.ipv4.ip_forward=1' in _sysctl_conf_content.results[0].stdout"
+          - "'net.ipv4.ip_forward=0' not in _sysctl_conf_content.results[0].stdout"
+          - "'net.core.somaxconn' not in _sysctl_conf_content.results[0].stdout"
+          - "'net.core.somaxconn=4096' in _sysctl_conf_content.results[1].stdout"
+          - "'net.ipv4.ip_forward' not in _sysctl_conf_content.results[1].stdout"
+
+    - name: Read running sysctl values
+      ansible.builtin.command: sysctl -n net.ipv4.ip_forward net.core.somaxconn
+      register: _sysctl_values
+      changed_when: false
+
+    - name: Validate running sysctl values
+      ansible.builtin.assert:
+        that:
+          - _sysctl_values.stdout_lines == ['1', '4096']

@@ -1,0 +1,9 @@
+---
+- name: Maintain sysctl files
+  ansible.builtin.include_tasks: sysctl_file.yml
+  loop: "{{ base_default_sysctl | combine(base_sysctl, recursive=true) | dict2items }}"
+  loop_control:
+    loop_var: sysctl_file
+    label: "{{ sysctl_file.key }}"
+  tags:
+    - base-sysctl
