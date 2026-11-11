@@ -3,8 +3,8 @@ driver:
   name: docker
 
 platforms:
-  - name: instance_ubuntu_22.04
-    image: ubuntu:22.04
+  - name: instance_ubuntu_24.04
+    image: ubuntu:24.04
     pre_build_image: false
     privileged: true
     build:
