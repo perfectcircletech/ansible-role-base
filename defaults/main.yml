@@ -32,3 +32,12 @@ base_sysctl_dir: "/etc/sysctl.d"
 base_sysctl_ignore_errors: false
 base_default_sysctl: {}
 base_sysctl: {}
+# systemd-timesyncd settings
+base_timesyncd_enabled: true
+base_timesyncd_package: "systemd-timesyncd"
+base_timesyncd_conf_file: "/etc/systemd/timesyncd.conf.d/ansible.conf"
+base_timesyncd_ntp_servers: []
+base_timesyncd_fallback_ntp_servers: []
+base_timesyncd_root_distance_max_sec: 5
+base_timesyncd_poll_interval_min_sec: 32
+base_timesyncd_poll_interval_max_sec: 2048

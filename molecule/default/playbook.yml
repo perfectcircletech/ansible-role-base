@@ -54,3 +54,10 @@
             net.ipv4.ip_forward: 1
           /etc/sysctl.d/20-net-core.conf:
             net.core.somaxconn: 4096
+        base_timesyncd_ntp_servers:
+          - ntp1.example.com
+          - ntp2.example.com
+        base_timesyncd_fallback_ntp_servers:
+          - 0.pool.ntp.org
+          - 1.pool.ntp.org
+        base_timesyncd_poll_interval_max_sec: 1024

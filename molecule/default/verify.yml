@@ -149,3 +149,30 @@
       ansible.builtin.assert:
         that:
           - _sysctl_values.stdout_lines == ['1', '4096']
+
+- name: Verify base systemd-timesyncd configuration
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Read systemd-timesyncd drop-in config
+      ansible.builtin.command: cat /etc/systemd/timesyncd.conf.d/ansible.conf
+      register: _timesyncd_conf_content
+      changed_when: false
+
+    - name: Validate systemd-timesyncd drop-in config
+      ansible.builtin.assert:
+        that:
+          - "'[Time]' in _timesyncd_conf_content.stdout"
+          - "'NTP=ntp1.example.com ntp2.example.com' in _timesyncd_conf_content.stdout"
+          - "'FallbackNTP=0.pool.ntp.org 1.pool.ntp.org' in _timesyncd_conf_content.stdout"
+          - "'RootDistanceMaxSec=5' in _timesyncd_conf_content.stdout"
+          - "'PollIntervalMinSec=32' in _timesyncd_conf_content.stdout"
+          - "'PollIntervalMaxSec=1024' in _timesyncd_conf_content.stdout"
+
+    - name: Gather package facts
+      ansible.builtin.package_facts:
+
+    - name: Validate systemd-timesyncd package is installed
+      ansible.builtin.assert:
+        that:
+          - "'systemd-timesyncd' in ansible_facts.packages"

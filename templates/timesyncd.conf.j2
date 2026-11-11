@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+[Time]
+{% if base_timesyncd_ntp_servers | length > 0 %}
+NTP={{ base_timesyncd_ntp_servers | join(' ') }}
+{% endif %}
+{% if base_timesyncd_fallback_ntp_servers | length > 0 %}
+FallbackNTP={{ base_timesyncd_fallback_ntp_servers | join(' ') }}
+{% endif %}
+RootDistanceMaxSec={{ base_timesyncd_root_distance_max_sec }}
+PollIntervalMinSec={{ base_timesyncd_poll_interval_min_sec }}
+PollIntervalMaxSec={{ base_timesyncd_poll_interval_max_sec }}

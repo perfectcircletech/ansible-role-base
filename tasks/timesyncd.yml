@@ -1,0 +1,39 @@
+---
+- name: Maintain systemd-timesyncd
+  when: base_timesyncd_enabled
+  tags:
+    - base-timesyncd
+  block:
+    - name: Install systemd-timesyncd package
+      ansible.builtin.apt:
+        pkg: "{{ base_timesyncd_package }}"
+      when: ansible_pkg_mgr == 'apt'
+      register: _install_timesyncd
+      until: _install_timesyncd is success
+      retries: 5
+      delay: 2
+
+    - name: Ensure systemd-timesyncd drop-in directory exists
+      ansible.builtin.file:
+        path: "{{ base_timesyncd_conf_file | dirname }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Maintain systemd-timesyncd drop-in config
+      ansible.builtin.template:
+        src: timesyncd.conf.j2
+        dest: "{{ base_timesyncd_conf_file }}"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+      notify: Restart systemd-timesyncd
+
+    - name: Ensure systemd-timesyncd is enabled and running
+      ansible.builtin.systemd_service:
+        name: systemd-timesyncd
+        enabled: true
+        state: started
+      when: ansible_facts.service_mgr == 'systemd'

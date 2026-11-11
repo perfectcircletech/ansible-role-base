@@ -64,3 +64,8 @@
   ansible.builtin.include_tasks: sysctl.yml
   tags:
     - base-sysctl
+
+- name: Maintain systemd-timesyncd
+  ansible.builtin.include_tasks: timesyncd.yml
+  tags:
+    - base-timesyncd
